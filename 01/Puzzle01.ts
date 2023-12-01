@@ -1,5 +1,9 @@
 import {parseFile} from "../utilities/Utils"
 
+/**
+ * To solve this we break each line into an array, then we itterate through each character until we find a number.
+ * We add that number to our total times ten and then reitterate over the array coming from the other direction.
+ */
 function solve1() {
     const file: string[] = parseFile("input01-a.txt");
     let total: number = 0;
@@ -26,6 +30,11 @@ function solve1() {
     console.log(total)
 }
 
+/**
+ * General idea is the same with this one as it was with the previous one. We spit the array up into characters and test each character,
+ * the only difference is that we also use that characters index to check if it is the start of a number word. If it is, we return the number
+ * and start from the back end.
+ */
 function solve2() {
     const file: string[] = parseFile("input01-b.txt");
     let total: number = 0;
@@ -56,6 +65,15 @@ function solve2() {
     console.log(total);
 }
 
+//HELPER FUNCTIONS
+
+/**
+ * This function lets us check the index of the character we are working with to see if there is a number word in that
+ * position. If there is, it returns the corresponding value, if not it returns 0.
+ * @param i Index of the character in question
+ * @param input Line the character is part of
+ * @returns Value of a number word found or zero
+ */
 function checkForNumberWords(i: number, input: string): number {
     const numbers: numberBond[] = [
         {label:"one", value:1 }, 
@@ -77,6 +95,9 @@ function checkForNumberWords(i: number, input: string): number {
     return 0;
 }
 
+/**
+ * This interface is for checkForNumberWords so we can crosswalk the value with the english word
+ */
 interface numberBond {
     label: string;
     value: number;

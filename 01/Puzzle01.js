@@ -8,41 +8,34 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 exports.__esModule = true;
 var Utils_1 = require("../utilities/Utils");
-var solve = function () {
-    // solve1();
-    solve2();
-};
+/**
+ * To solve this we break each line into an array, then we itterate through each character until we find a number.
+ * We add that number to our total times ten and then reitterate over the array coming from the other direction.
+ */
 function solve1() {
     var file = Utils_1.parseFile("input01-a.txt");
     var total = 0;
     for (var line in file) {
         var firstDigit = 0;
         var secondDigit = 0;
-        var firstDigitFound = false;
-        var secondDigitFound = false;
         var input = file[line];
         var inputChars = __spreadArrays(input);
-        for (var i = 0; i < inputChars.length && !firstDigitFound; i++) {
-            var value = parseInt(inputChars[i], 10);
-            if (!isNaN(value)) {
-                firstDigit = value;
-                firstDigitFound = true;
-                console.log("First digit found, first digit is " + firstDigit);
-            }
+        for (var i = 0; i < inputChars.length && firstDigit == 0; i++) {
+            firstDigit = parseValues(inputChars[i], firstDigit, i);
+            total += (10 * firstDigit);
         }
-        for (var i = inputChars.length; i >= 0 && !secondDigitFound; i--) {
-            var value = parseInt(inputChars[i], 10);
-            if (!isNaN(value)) {
-                secondDigit = value;
-                secondDigitFound = true;
-                console.log("Second digit found, second digit is " + secondDigit);
-            }
+        for (var i = inputChars.length; i >= 0 && secondDigit == 0; i--) {
+            secondDigit = parseValues(inputChars[i], secondDigit, i);
+            total += secondDigit;
         }
-        total += (10 * firstDigit);
-        total += secondDigit;
     }
     console.log(total);
 }
+/**
+ * General idea is the same with this one as it was with the previous one. We spit the array up into characters and test each character,
+ * the only difference is that we also use that characters index to check if it is the start of a number word. If it is, we return the number
+ * and start from the back end.
+ */
 function solve2() {
     var file = Utils_1.parseFile("input01-b.txt");
     var total = 0;
@@ -52,28 +45,24 @@ function solve2() {
         var input = file[line];
         var inputChars = __spreadArrays(input);
         for (var i = 0; i < inputChars.length && firstDigit == 0; i++) {
-            var value = parseInt(inputChars[i], 10);
-            if (!isNaN(value)) {
-                firstDigit = value;
-            }
-            else {
-                firstDigit = checkForNumberWords(i, input);
-            }
+            firstDigit = parseValues(inputChars[i], firstDigit, i, input);
             total += (10 * firstDigit);
         }
         for (var i = inputChars.length; i >= 0 && secondDigit == 0; i--) {
-            var value = parseInt(inputChars[i], 10);
-            if (!isNaN(value)) {
-                secondDigit = value;
-            }
-            else {
-                secondDigit = checkForNumberWords(i, input);
-            }
+            secondDigit = parseValues(inputChars[i], secondDigit, i, input);
             total += secondDigit;
         }
     }
     console.log(total);
 }
+//HELPER FUNCTIONS
+/**
+ * This function lets us check the index of the character we are working with to see if there is a number word in that
+ * position. If there is, it returns the corresponding value, if not it returns 0.
+ * @param i Index of the character in question
+ * @param input Line the character is part of
+ * @returns Value of a number word found or zero
+ */
 function checkForNumberWords(i, input) {
     var numbers = [
         { label: "one", value: 1 },
@@ -94,4 +83,15 @@ function checkForNumberWords(i, input) {
     }
     return 0;
 }
-solve();
+function parseValues(inputChar, digit, index, input) {
+    var value = parseInt(inputChar, 10);
+    if (!isNaN(value)) {
+        digit = value;
+    }
+    else if (typeof input !== 'undefined') {
+        digit = checkForNumberWords(index, input);
+    }
+    return digit;
+}
+solve1();
+solve2();
