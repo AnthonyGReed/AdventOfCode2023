@@ -23,3 +23,14 @@ function parseFile(filename) {
     }
 }
 exports.parseFile = parseFile;
+var Coord = /** @class */ (function () {
+    function Coord(row, col) {
+        this.row = row;
+        this.column = col;
+    }
+    Coord.prototype.equals = function (other) {
+        return (this.row == other.row && this.column == other.column);
+    };
+    return Coord;
+}());
+exports.Coord = Coord;

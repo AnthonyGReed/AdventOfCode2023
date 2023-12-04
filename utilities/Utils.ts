@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { isConstructorDeclaration, removeEmitHelper } from 'typescript';
 
 export function parseFile(filename: string): string[] {
   try {
@@ -20,5 +21,19 @@ export function parseFile(filename: string): string[] {
     // Handle file read errors
     console.error(`Error reading file ${filename}: ${message}`);
     return [];
+  }
+}
+
+export class Coord {
+  row: number;
+  column: number;
+
+  constructor(row: number, col: number) {
+    this.row = row;
+    this.column = col;
+  }
+
+  equals(other: Coord): boolean {
+    return (this.row == other.row && this.column == other.column);
   }
 }
