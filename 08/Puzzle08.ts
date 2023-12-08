@@ -1,7 +1,8 @@
 import {parseFile} from "../utilities/Utils"
 
 /**
- * Puzzle Solution Description:
+ * Puzzle Solution Description: For this one, I loop through the instructions and reset my working node to the node on the
+ * left or right, I count until I find the destination node and return the count.
  */
 function solve1() {
     const start: number = new Date().getTime();
@@ -37,7 +38,8 @@ function solve1() {
 }
 
 /**
- * Puzzle Solution Description:
+ * Puzzle Solution Description: I tried to brute force this one and id din't work. So instead we find the lowest common multiple of
+ * the set and return it
  */
 function solve2() {
     const start: number = new Date().getTime();

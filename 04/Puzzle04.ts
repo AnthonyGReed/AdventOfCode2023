@@ -1,7 +1,8 @@
 import {parseFile} from "../utilities/Utils"
 
 /**
- * Puzzle Solution Description:
+ * Puzzle Solution Description: This builds a ticket obejct and ticket book. It scores each ticket and increments
+ * the output when the ticket is a winner.
  */
 function solve1() {
     const file: string[] = parseFile("input.txt");
@@ -24,7 +25,10 @@ function solve1() {
 }
 
 /**
- * Puzzle Solution Description:
+ * Puzzle Solution Description: This is like the previous one, but instead of incrementing a 
+ * counter on a win it adds copies to teh next set of objects as per the rules. Rather than
+ * creating a bunch of objects and blowing the heap, we instead put an attribute on the ticket
+ * that keeps count of how many copies there are.
  */
 function solve2() {
     const file: string[] = parseFile("input.txt");
