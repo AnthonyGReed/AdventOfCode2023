@@ -1,7 +1,8 @@
 import {parseFile, Coord} from "../utilities/Utils"
 
 /**
- * Puzzle Solution Description:
+ * Puzzle Solution Description: This is a full on grid build. Build out the pipe objects, fill them in
+ * the puzzle. Follow the path using the node's boolean values. It's ugly but it's also very cool.
  */
 function solve1() {
     const start: number = new Date().getTime();
@@ -15,7 +16,6 @@ function solve1() {
     let count: number = 0;
     if(workingNode !== undefined) {
         while(!backAtTheStart) {
-            // console.log(workingNode?.character + " - (" + workingNode?.coord.row + ", " + workingNode?.coord.column + ")" )
             workingNode = grid.makeMove(workingNode);
             count++;
             if(workingNode?.startingPoint) {
@@ -28,15 +28,58 @@ function solve1() {
 }
 
 /**
- * Puzzle Solution Description:
+ * Puzzle Solution Description: This took me for ever to figure out. I tried to do it mathy using 
+ * the shoelace theorm but my number just weren't lining up correctly. So instead I devised this method.
+ * Line by line we determine if we are in the shape or out of it by the pipes and their configurations
+ * and count the spaces inside. It feels a little hacky but it got me where I was going. Hooray!
  */
 function solve2() {
     const start: number = new Date().getTime();
-    const file: string[] = parseFile("sample.txt");
-//Do everything in part 1
-//Get all the verticies
-//Cross multiply the verticies x1 y2 - x2 y1 + x2 y3 - y2 y3 + ... xn y1 - yn x1 / 2 for area
-//subtract the count from the area to get those trapped inside
+    const file: string[] = parseFile("input.txt");
+    let grid: Grid = new Grid();
+    for(const line of file) {
+        grid.add([...line]);
+    }
+    let workingNode: Node | undefined = grid.getStartingNode();
+    let backAtTheStart: boolean = false;
+    let count: number = 0;
+    if(workingNode !== undefined) {
+        while(!backAtTheStart) {
+            workingNode = grid.makeMove(workingNode);
+            count++;
+            if(workingNode?.startingPoint) {
+                backAtTheStart = true;
+            }
+        }
+    }
+    let loopCounter: number = 0;
+    let inLoop: boolean = false;
+    let northLoop: boolean = false;
+    let southLoop: boolean = false;
+    for(const row of grid.grid) {
+        for(const col of row) {
+            if(col.inLoop && col.north && col.south) {
+                inLoop = !inLoop
+            } else if(inLoop && !col.inLoop) {
+                loopCounter++;
+            } else if(col.inLoop && col.north && !col.south) {
+                if(southLoop) {
+                    southLoop = false;
+                    inLoop = !inLoop;
+                } else {
+                    northLoop = !northLoop;
+                }
+            } else if(col.inLoop && col.south && !col.north) {
+                if(northLoop) {
+                    northLoop = false;
+                    inLoop = !inLoop;
+                } else {
+                    southLoop = !southLoop;
+                }
+            }
+        }
+    }
+    console.log(loopCounter)
     console.log("Application ran in " + ((new Date().getTime() - start)/1000) + " seconds");
 }
 
@@ -46,7 +89,8 @@ class Node {
     south: boolean = false;
     east: boolean = false;
     west: boolean = false;
-    startingPoint = false;
+    startingPoint: boolean = false;
+    inLoop: boolean = false;
     coord: Coord;
     character: string;
 
@@ -83,6 +127,10 @@ class Node {
                 break;
         }
     }
+
+    toString() {
+        return "North: " + this.north + ", South: " + this.south + ", East: " + this.east + ", West: " + this.west + ", In Loop: " + this.inLoop + ", coords: " + this.coord.row + ", " + this.coord.column 
+    }
 }
 
 class Grid {
@@ -104,22 +152,25 @@ class Grid {
             row.push(node);
             if(input[char] == "S") {
                 this.startingPoint = node;
+                node.inLoop = true;
             }
         }
         this.grid.push(row);
     }
 
-    getStartingNode() {
+    getStartingNode(): Node | undefined{
         if(this.startingPoint !== undefined) {
-            if(this.grid[this.startingPoint.coord.row - 1][this.startingPoint.coord.column] !== undefined && this.grid[this.startingPoint.coord.row - 1][this.startingPoint.coord.column].south) {
+            if(this.grid[this.startingPoint.coord.row - 1] !== undefined && this.grid[this.startingPoint.coord.row - 1][this.startingPoint.coord.column].south) {
                 this.startingPoint.north = true;
+            }
+            if(this.grid[this.startingPoint.coord.row + 1] !== undefined && this.grid[this.startingPoint.coord.row + 1][this.startingPoint.coord.column].north) {
+                this.startingPoint.south = true;
             }
             if(this.grid[this.startingPoint.coord.row][this.startingPoint.coord.column - 1] !== undefined && this.grid[this.startingPoint.coord.row][this.startingPoint.coord.column - 1].east) {
                 this.startingPoint.west = true;
             }
-            if(!this.startingPoint.north && !this.startingPoint.west) {
+            if(this.grid[this.startingPoint.coord.row][this.startingPoint.coord.column + 1] !== undefined && this.grid[this.startingPoint.coord.row][this.startingPoint.coord.column + 1].west) {
                 this.startingPoint.east = true;
-                this.startingPoint.south = true;
             }
         }
         return this.startingPoint;
@@ -127,6 +178,7 @@ class Grid {
 
     makeMove(node: Node | undefined): Node | undefined {
         if(node !== undefined) {
+            node.inLoop = true;
             if(this.previousDirection !== "North" && node.north) {
                 this.previousDirection = "South"
                 return this.grid[node.coord.row - 1][node.coord.column]
@@ -150,4 +202,4 @@ class Grid {
 
 
 solve1();
-//solve2();
+solve2();
